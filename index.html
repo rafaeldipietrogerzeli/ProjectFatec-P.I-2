@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#060e1a" />
+  <meta name="description" content="Catch Buddies - Aplicativo social gamificado para encontrar pessoas e iniciar amizades." />
+  <title>Catch Buddies</title>
+  <link rel="icon" type="image/png" href="assets/logo/logo.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet Map Stylesheet (Local + CDN fallback) -->
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css" />
+
+  <!-- Folhas de Estilo Modulares -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+  <!-- Moldura Mobile Central / App Container -->
+  <main class="phone-frame" role="application">
+
+    <!-- Cabeçalho Principal -->
+    <header class="app-header">
+      <div class="header-brand">
+        <img class="header-logo" src="assets/logo/logo.png" alt="Logotipo Catch Buddies" />
+        <h1 class="header-title" id="header-title">Descobrir Buddies</h1>
+      </div>
+      <div class="header-status" title="Sinal do radar ativo">
+        <span class="header-status-dot" aria-hidden="true"></span>
+        <span>Radar Ativo</span>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal Dinâmico (SPA) -->
+    <section class="main-content">
+
+      <!-- ====================================================================
+           1. ÁREA: DESCOBRIR
+           ==================================================================== -->
+      <section id="view-discover" class="view view-active" aria-labelledby="discover-heading">
+        <!-- Mapa Interativo de Buddies Próximos -->
+        <div class="map-card" id="map-card" aria-label="Mapa de buddies próximos">
+          <div class="map-top-bar">
+            <div class="map-status-pill">
+              <span class="header-status-dot" aria-hidden="true"></span>
+              <span>GPS: Fatec Marília</span>
+            </div>
+            <div class="map-range-pill">
+              <span>⚡ Raio: 100m</span>
+            </div>
+          </div>
+
+          <div id="buddy-map"></div>
+
+          <div class="map-floating-controls">
+            <button class="btn-map-control" id="btn-map-center-me" title="Centralizar mapa em você">
+              <span>🎯 Minha Posição</span>
+            </button>
+            <button class="btn-map-control" id="btn-map-reset-fatec" title="Voltar ao ponto inicial na Fatec">
+              <span>📍 Ponto Inicial</span>
+            </button>
+          </div>
+        </div>
+
+        <h2 id="discover-heading" class="view-title">Possíveis Buddies</h2>
+        <p class="view-subtitle">Pessoas encontradas na sua área de proximidade</p>
+
+        <!-- Lista de Possíveis Buddies -->
+        <div class="buddies-list" id="discover-buddies-list">
+          <!-- Renderizado dinamicamente pelo JavaScript -->
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           2. ÁREA: CAPTURAS
+           ==================================================================== -->
+      <section id="view-captures" class="view" aria-labelledby="captures-heading">
+        <h2 id="captures-heading" class="view-title">Solicitações de Captura</h2>
+        <p class="view-subtitle">Gerencie suas conexões pendentes e enviadas</p>
+
+        <!-- Abas de Navegação -->
+        <nav class="tabs-header" aria-label="Abas de capturas">
+          <button class="tab-btn tab-active" data-tab="received">
+            <span>Recebidas</span>
+            <span class="tab-count" id="tab-count-received">0</span>
+          </button>
+          <button class="tab-btn" data-tab="sent">
+            <span>Enviadas</span>
+            <span class="tab-count" id="tab-count-sent">0</span>
+          </button>
+        </nav>
+
+        <!-- Conteúdo da Aba Recebidas -->
+        <div class="buddies-list" id="captures-received-content">
+          <!-- Renderizado dinamicamente pelo JavaScript -->
+        </div>
+
+        <!-- Conteúdo da Aba Enviadas -->
+        <div class="buddies-list" id="captures-sent-content" style="display: none;">
+          <!-- Renderizado dinamicamente pelo JavaScript -->
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           3. ÁREA: BUDDIES (AMIGOS CONECTADOS)
+           ==================================================================== -->
+      <section id="view-buddies" class="view" aria-labelledby="buddies-heading">
+        <h2 id="buddies-heading" class="view-title">Seus Buddies</h2>
+        <p class="view-subtitle">Amizades confirmadas com chat particular liberado</p>
+
+        <div class="buddies-list" id="buddies-list-content">
+          <!-- Renderizado dinamicamente pelo JavaScript -->
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           4. ÁREA: PERFIL DO USUÁRIO
+           ==================================================================== -->
+      <section id="view-profile" class="view" aria-labelledby="profile-heading">
+        <h2 id="profile-heading" class="view-title">Seu Perfil</h2>
+        <p class="view-subtitle">Informações e preferências da sua conta demonstrativa</p>
+
+        <div class="profile-card">
+          <img class="profile-avatar-large" id="profile-avatar-display" src="assets/avatars/user_current.svg" alt="Foto do usuário" />
+          <div>
+            <h3 id="profile-name-display" style="font-size: 1.25rem; font-weight: 800;">Usuário</h3>
+            <p id="profile-handle-display" style="color: var(--text-secondary); font-size: 0.85rem;">@usuario</p>
+          </div>
+          <p id="profile-bio-display" style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.4;">Biografia do usuário</p>
+
+          <!-- Estatísticas -->
+          <div class="profile-stats-grid">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-friends-count">0</span>
+              <span class="stat-label">Buddies</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-sent-count">0</span>
+              <span class="stat-label">Enviadas</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-rec-count">0</span>
+              <span class="stat-label">Recebidas</span>
+            </div>
+          </div>
+
+          <!-- Formulário de Edição -->
+          <form class="profile-form" id="profile-form">
+            <div class="form-group">
+              <label class="form-label" for="profile-input-name">Nome</label>
+              <input class="form-input" type="text" id="profile-input-name" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-input-handle">Nome de Usuário (@)</label>
+              <input class="form-input" type="text" id="profile-input-handle" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-input-bio">Biografia Curta</label>
+              <textarea class="form-textarea" id="profile-input-bio" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-input-interests">Interesses (separados por vírgula)</label>
+              <input class="form-input" type="text" id="profile-input-interests" />
+            </div>
+            <button class="btn btn-primary" type="submit" style="margin-top: 6px;">
+              <span>Salvar Alterações</span>
+            </button>
+          </form>
+
+          <!-- Botão de Restauração da Demonstração -->
+          <button class="btn btn-restore-demo" id="btn-restore-demo" type="button">
+            <span>🔄 Restaurar Demonstração</span>
+          </button>
+        </div>
+      </section>
+
+    </section>
+
+    <!-- ====================================================================
+         BARRA DE NAVEGAÇÃO INFERIOR
+         ==================================================================== -->
+    <nav class="bottom-nav" aria-label="Navegação principal">
+      <button class="nav-item nav-active" data-view="discover" aria-label="Descobrir possíveis buddies">
+        <span class="nav-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+          </svg>
+        </span>
+        <span>Descobrir</span>
+      </button>
+
+      <button class="nav-item" data-view="captures" aria-label="Ver solicitações de captura">
+        <span class="nav-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span class="nav-badge" id="captures-nav-badge" data-count="0" aria-label="Novas capturas recebidas">0</span>
+        </span>
+        <span>Capturas</span>
+      </button>
+
+      <button class="nav-item" data-view="buddies" aria-label="Ver lista de buddies confirmados">
+        <span class="nav-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </span>
+        <span>Buddies</span>
+      </button>
+
+      <button class="nav-item" data-view="profile" aria-label="Acessar seu perfil">
+        <span class="nav-icon-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </span>
+        <span>Perfil</span>
+      </button>
+    </nav>
+
+    <!-- ====================================================================
+         PAINEL DE CHAT INDIVIDUAL (SOBREPOSIÇÃO)
+         ==================================================================== -->
+    <div class="chat-overlay" id="chat-overlay" role="dialog" aria-modal="true" aria-label="Conversa com Buddy">
+      <div class="chat-header">
+        <button class="btn-back-chat" id="btn-back-chat" aria-label="Voltar para a lista de amigos">←</button>
+        <div class="avatar-wrapper" style="width: 42px; height: 42px;">
+          <img class="avatar-img" id="chat-header-avatar" src="" alt="" />
+        </div>
+        <div class="chat-user-details">
+          <h2 class="chat-user-name" id="chat-header-name">Buddy</h2>
+          <div class="chat-user-status" id="chat-header-status">
+            <span class="status-dot online"></span> Online
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-messages-container" id="chat-messages-box">
+        <!-- Mensagens renderizadas dinamicamente -->
+      </div>
+
+      <form class="chat-input-bar" id="chat-form">
+        <input
+          class="chat-input-field"
+          id="chat-input"
+          type="text"
+          placeholder="Digite uma mensagem..."
+          autocomplete="off"
+          aria-label="Mensagem de texto"
+        />
+        <button class="btn-send-message" type="submit" aria-label="Enviar mensagem">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- ====================================================================
+         MODAL DE PERFIL RESUMIDO
+         ==================================================================== -->
+    <div class="modal-backdrop" id="buddy-modal" role="dialog" aria-modal="true" aria-label="Perfil do Buddy">
+      <div class="modal-dialog">
+        <button class="modal-close-btn" aria-label="Fechar perfil">✕</button>
+        <div id="buddy-modal-body">
+          <!-- Conteúdo gerado dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Container de Notificações Toasts -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  </main>
+
+  <!-- Leaflet Map Library (Local) -->
+  <script src="assets/vendor/leaflet/leaflet.js"></script>
+
+  <!-- Script Principal da Aplicação -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
